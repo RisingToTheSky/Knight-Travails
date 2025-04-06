@@ -1,4 +1,3 @@
-# Template
+# Knight Travails
 
-This is my template repository for future projects with
-JavaScript.
+This is my Knight Travails project for The Odin Project.
