@@ -38,33 +38,59 @@ function keyToString(key) {
     return [`${key[0]}`, `${key[1]}`].join("::");
 }
 
-function breadthFirstSearch(root, map) {
+function breadthFirstSearch(root, end, map) {
     let queue = [];
-    let visited = new Set();
+    let visited = [];
+    let previous = new Map();
 
     queue.push(root);
-    visited.add(root);
+    visited.push(root);
     while (queue.length != 0) {
         let currentKey = queue.shift();
         let stringKey = keyToString(currentKey);
         let neighbors = map.get(stringKey);
         for (let i = 0; i < neighbors.length; i++) {
-            if (!visited.has(neighbors[i])) {
+            if (neighbors[i].join() === end.join()) {
+                visited.push(keyToString(neighbors[i]));
+                previous.set(keyToString(neighbors[i]), currentKey);
+                return previous;
+            } else if (!visited.includes(keyToString(neighbors[i]))) {
                 queue.push(neighbors[i]);
-                visited.add(neighbors[i]);
+                visited.push(keyToString(neighbors[i]));
+                previous.set(keyToString(neighbors[i]), currentKey);
             }
         }
     }
 
-    return visited;
+    return previous;
+}
+
+function findShortestPath(start, end) {
+    let adjacencyMap = setUpAdjacencyMap();
+    let search = breadthFirstSearch(start, end, adjacencyMap);
+    let path = [];
+    let key = keyToString(end);
+    path.unshift(end);
+    while (key !== keyToString(start)) {
+        let value = search.get(key);
+        path.unshift(value);
+        key = keyToString(value);
+    }
+
+    return path;
 }
 
 function knightMoves(start, end) {
-    let adjacencyMap = setUpAdjacencyMap();
-    let search = breadthFirstSearch([0,0], adjacencyMap);
-    console.log(search);
-    return start;
+    let path = findShortestPath(start, end);
+    let message = `You made it in ${path.length - 1} moves!  Here's your path: \n`;
+    for (let i = 0; i < path.length; i++) {
+        message += `[${path[i]}] \n`;
+    }
+
+    return message;
 }
 
-console.log(setUpAdjacencyMap());
 console.log(knightMoves([0,0], [3,3]));
+console.log(knightMoves([3,3], [0,0]));
+console.log(knightMoves([3,3], [4,3]));
+console.log(knightMoves([0,0], [7,7]));
